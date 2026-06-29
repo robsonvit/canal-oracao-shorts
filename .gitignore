@@ -1,0 +1,17 @@
+# Arquivos gerados localmente — NÃO versionar
+output/
+data/bg_music_*.mp3
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.env
+
+# Credenciais locais
+*.json
+!data/videos_usados_shorts.json
+
+# Logs
+*.log
+*.txt

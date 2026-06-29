@@ -1,0 +1,110 @@
+name: 📱 Gerar Short de Oração
+
+on:
+  # ── Disparos automáticos 3x/dia (horário UTC — fuso Brasília UTC-3) ────────
+  schedule:
+    - cron: '0 9 * * *'    # 06:00 BRT → Bom Dia (nascer do sol)
+    - cron: '0 15 * * *'   # 12:00 BRT → Boa Tarde (entardecer)
+    - cron: '0 21 * * *'   # 18:00 BRT → Boa Noite (lua/estrelas)
+
+  # ── Execução manual com escolha do período ──────────────────────────────────
+  workflow_dispatch:
+    inputs:
+      periodo:
+        description: 'Período do dia (deixe vazio para detectar automaticamente)'
+        required: false
+        default: ''
+        type: choice
+        options:
+          - ''
+          - bom_dia
+          - boa_tarde
+          - boa_noite
+
+permissions:
+  contents: write    # Para salvar tracking de vídeos usados
+
+env:
+  GROQ_API_KEY:              ${{ secrets.GROQ_API_KEY }}
+  PEXELS_API_KEY:            ${{ secrets.PEXELS_API_KEY }}
+  YOUTUBE_CLIENT_ID:         ${{ secrets.YOUTUBE_CLIENT_ID }}
+  YOUTUBE_CLIENT_SECRET:     ${{ secrets.YOUTUBE_CLIENT_SECRET }}
+  YOUTUBE_REFRESH_TOKEN:     ${{ secrets.YOUTUBE_REFRESH_TOKEN }}
+  PERIODO:                   ${{ github.event.inputs.periodo }}
+
+jobs:
+  gerar-short:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45   # Shorts são muito mais rápidos que o vídeo principal
+
+    steps:
+      - name: 📥 Checkout do repositório
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 1
+
+      - name: 🐍 Configurar Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: 🎬 Instalar FFmpeg e fontes
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y \
+            ffmpeg \
+            fonts-dejavu-extra \
+            fonts-liberation \
+            fonts-freefont-ttf
+
+      - name: 📦 Instalar dependências Python
+        run: pip install -r requirements.txt
+
+      - name: 📁 Criar diretórios necessários
+        run: mkdir -p output data output/clips output/tmp_raw
+
+      - name: 📱 Executar pipeline de Short
+        run: python scripts/pipeline.py
+
+      - name: 📊 Verificar arquivos gerados
+        run: |
+          echo "📁 Arquivos na pasta output:"
+          ls -lh output/ 2>/dev/null || echo "(vazia)"
+          echo ""
+          echo "📋 Tracking de vídeos usados:"
+          cat data/videos_usados_shorts.json 2>/dev/null | python3 -c "
+          import json,sys
+          data=json.load(sys.stdin)
+          print(f'Total de vídeos registrados: {len(data)}')
+          " || echo "(arquivo não encontrado)"
+          echo ""
+          echo "📖 Conteúdo gerado:"
+          cat output/conteudo.json 2>/dev/null | python3 -c "
+          import json,sys
+          data=json.load(sys.stdin)
+          print(f'Período   : {data.get(\"saudacao\", \"?\")}')
+          print(f'Versículo : {data.get(\"versiculo_ref\", \"?\")}')
+          print(f'Título    : {data.get(\"titulo\", \"?\")}')
+          print(f'Palavras  : {len(data.get(\"oracao_texto\", \"\").split())}')
+          " || echo "(não encontrado)"
+
+      - name: 💾 Salvar tracking de vídeos no repositório
+        run: |
+          git config user.name "Canal Oração Shorts Bot"
+          git config user.email "bot@canal-oracao-shorts.com"
+          git add data/videos_usados_shorts.json
+          git diff --staged --quiet || git commit -m "🎬 Atualiza tracking de vídeos [skip ci]"
+          git pull --rebase origin main
+          git push
+
+      - name: 📤 Upload de artefatos (backup por 3 dias)
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: short-${{ github.run_number }}-${{ github.run_attempt }}
+          path: |
+            output/*.mp4
+            output/conteudo.json
+          retention-days: 3
