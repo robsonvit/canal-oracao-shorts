@@ -85,50 +85,8 @@ def montar_video(
         "MarginV=90",
     ])
 
-    texto_esc = ""
-    ref_esc = ""
-    if versiculo_texto:
-        palavras = versiculo_texto.split()
-        linhas = []
-        linha_atual = []
-        chars = 0
-        for p in palavras:
-            if chars + len(p) + 1 > 28:
-                linhas.append(" ".join(linha_atual))
-                linha_atual = [p]
-                chars = len(p)
-            else:
-                linha_atual.append(p)
-                chars += len(p) + 1
-        if linha_atual:
-            linhas.append(" ".join(linha_atual))
-
-        texto_formatado = "\n".join(linhas)
-        ref_formatada   = f"— {versiculo_ref}"
-
-        # Usar textfile evita qualquer problema de escaping do FFmpeg (aspas, dois-pontos, quebras de linha)
-        textfile_path = os.path.join(output_dir, "card_text.txt")
-        reffile_path  = os.path.join(output_dir, "card_ref.txt")
-        
-        with open(textfile_path, "w", encoding="utf-8") as f:
-            f.write(texto_formatado)
-        with open(reffile_path, "w", encoding="utf-8") as f:
-            f.write(ref_formatada)
-            
-        textfile_esc = textfile_path.replace("\\", "/")
-        textfile_esc = re.sub(r"^([A-Za-z]):", r"\1\\:", textfile_esc)
-        
-        reffile_esc = reffile_path.replace("\\", "/")
-        reffile_esc = re.sub(r"^([A-Za-z]):", r"\1\\:", reffile_esc)
-
-    # Monta a string de filtros de vídeo
-    v_filters = "[0:v]eq=brightness=-0.03:contrast=1.02"
-    if versiculo_texto:
-        v_filters += (
-            f",drawtext=fontsize=52:fontcolor=white:x=(w-text_w)/2:y=580:textfile='{textfile_esc}':line_spacing=24:shadowcolor=black:shadowx=4:shadowy=4:enable='between(t,0,6)'"
-            f",drawtext=fontsize=45:fontcolor=#FFD700:x=(w-text_w)/2:y=1320:textfile='{reffile_esc}':shadowcolor=black:shadowx=3:shadowy=3:enable='between(t,0,6)'"
-        )
-    v_filters += f",subtitles='{srt_escaped}':force_style='{subtitle_style}'[v]"
+    # Monta a string de filtros de vídeo (sem texto de versículo na tela)
+    v_filters = f"[0:v]eq=brightness=-0.03:contrast=1.02,subtitles='{srt_escaped}':force_style='{subtitle_style}'[v]"
 
     cmd_final = [
         "ffmpeg", "-y",
