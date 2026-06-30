@@ -114,7 +114,7 @@ ESTRUTURA OBRIGATÓRIA:
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 1. SAUDAÇÃO (1 parágrafo):
-   - "{saudacao}! Que Deus abençoe este(a) {descricao} na sua vida."
+   - "{saudacao}! Que Deus abençoe esta {descricao} na sua vida."
    - Cite brevemente o versículo de {versiculo['ref']}
 
 2. ORAÇÃO BREVE PODEROSA (3 parágrafos curtos):

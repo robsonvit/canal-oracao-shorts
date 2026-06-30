@@ -77,10 +77,10 @@ def montar_video(
         "FontSize=18",
         "PrimaryColour=&H00FFFFFF",
         "OutlineColour=&H00000000",
-        "BackColour=&H99000000",
-        "BorderStyle=4",
-        "Outline=1",
-        "Shadow=2",
+        "BackColour=&H00000000",
+        "BorderStyle=1",
+        "Outline=2",
+        "Shadow=3",
         "Alignment=10",
         "MarginV=90",
     ])
@@ -103,26 +103,30 @@ def montar_video(
         if linha_atual:
             linhas.append(" ".join(linha_atual))
 
-        texto_formatado = r"\n".join(linhas)
+        texto_formatado = "\n".join(linhas)
         ref_formatada   = f"— {versiculo_ref}"
 
-        def _esc(s: str) -> str:
-            # Substituições necessárias para o drawtext aceitar o texto no filter_complex
-            s = s.replace("'", "\\'")
-            s = s.replace(":", r"\:")
-            s = s.replace(",", r"\,")
-            return s
-
-        texto_esc = _esc(texto_formatado)
-        ref_esc   = _esc(ref_formatada)
+        # Usar textfile evita qualquer problema de escaping do FFmpeg (aspas, dois-pontos, quebras de linha)
+        textfile_path = os.path.join(output_dir, "card_text.txt")
+        reffile_path  = os.path.join(output_dir, "card_ref.txt")
+        
+        with open(textfile_path, "w", encoding="utf-8") as f:
+            f.write(texto_formatado)
+        with open(reffile_path, "w", encoding="utf-8") as f:
+            f.write(ref_formatada)
+            
+        textfile_esc = textfile_path.replace("\\", "/")
+        textfile_esc = re.sub(r"^([A-Za-z]):", r"\1\\:", textfile_esc)
+        
+        reffile_esc = reffile_path.replace("\\", "/")
+        reffile_esc = re.sub(r"^([A-Za-z]):", r"\1\\:", reffile_esc)
 
     # Monta a string de filtros de vídeo
     v_filters = "[0:v]eq=brightness=-0.03:contrast=1.02"
-    if texto_esc:
+    if versiculo_texto:
         v_filters += (
-            f",drawbox=x=80:y=500:w=920:h=920:color=black@0.75:t=fill:enable='between(t,0,6)'"
-            f",drawtext=fontsize=52:fontcolor=white:x=130:y=580:text='{texto_esc}':line_spacing=24:shadowcolor=black:shadowx=2:shadowy=2:enable='between(t,0,6)'"
-            f",drawtext=fontsize=45:fontcolor=#FFD700:x=130:y=1320:text='{ref_esc}':shadowcolor=black:shadowx=2:shadowy=2:enable='between(t,0,6)'"
+            f",drawtext=fontsize=52:fontcolor=white:x=(w-text_w)/2:y=580:textfile='{textfile_esc}':line_spacing=24:shadowcolor=black:shadowx=4:shadowy=4:enable='between(t,0,6)'"
+            f",drawtext=fontsize=45:fontcolor=#FFD700:x=(w-text_w)/2:y=1320:textfile='{reffile_esc}':shadowcolor=black:shadowx=3:shadowy=3:enable='between(t,0,6)'"
         )
     v_filters += f",subtitles='{srt_escaped}':force_style='{subtitle_style}'[v]"
 
