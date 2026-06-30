@@ -96,7 +96,7 @@ jobs:
           git config user.email "bot@canal-oracao-shorts.com"
           git add data/videos_usados_shorts.json
           git diff --staged --quiet || git commit -m "🎬 Atualiza tracking de vídeos [skip ci]"
-          git pull --rebase origin main
+          git pull --rebase origin master
           git push
 
       - name: 📤 Upload de artefatos (backup por 3 dias)
