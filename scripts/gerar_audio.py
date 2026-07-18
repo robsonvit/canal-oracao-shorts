@@ -15,7 +15,6 @@ import asyncio
 import os
 import json
 
-import edge_tts
 from groq import Groq
 
 
