@@ -1,0 +1,144 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste de Vozes Masculinas TTS - Canal Oracao Shorts</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://js.puter.com/v2/"></script>
+    <style>
+        :root { --bg-dark:#0a0a14;--bg-card:#111120;--accent-gold:#f0a500;--accent-blue:#4f7bff;--accent-purple:#8b5cf6;--accent-green:#22c55e;--text-main:#e8e8ff;--text-muted:#7070a0;--border:#1e1e3a;--shadow:rgba(79,123,255,0.15); }
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'Inter',sans-serif;background:var(--bg-dark);color:var(--text-main);min-height:100vh;background-image:radial-gradient(ellipse at 20% 0%,rgba(79,123,255,.08) 0%,transparent 50%),radial-gradient(ellipse at 80% 100%,rgba(139,92,246,.08) 0%,transparent 50%)}
+        header{text-align:center;padding:50px 20px 30px;border-bottom:1px solid var(--border)}
+        .icon{font-size:3.5rem;margin-bottom:12px;animation:pulse 2s ease-in-out infinite}
+        @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
+        h1{font-size:2.2rem;font-weight:800;background:linear-gradient(135deg,#f0a500,#ff6b35);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:8px}
+        header p{color:var(--text-muted);font-size:1rem;max-width:600px;margin:0 auto}
+        .phrase-box{max-width:700px;margin:30px auto 10px;background:var(--bg-card);border:1px solid var(--border);border-radius:16px;padding:20px 30px;text-align:center}
+        .phrase-box label{display:block;color:var(--text-muted);font-size:.8rem;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px}
+        .phrase-text{font-size:1.4rem;font-weight:600;color:var(--accent-gold);font-style:italic}
+        .voices-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px;max-width:1100px;margin:30px auto;padding:0 20px 50px}
+        .voice-card{background:var(--bg-card);border:1px solid var(--border);border-radius:20px;padding:24px;transition:all .3s ease;position:relative;overflow:hidden}
+        .voice-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--card-accent,var(--accent-blue));border-radius:20px 20px 0 0}
+        .voice-card:hover{transform:translateY(-3px);border-color:rgba(79,123,255,.3);box-shadow:0 20px 40px var(--shadow)}
+        .voice-card.loading{border-color:var(--accent-gold);box-shadow:0 0 30px rgba(240,165,0,.2)}
+        .voice-card.success{border-color:var(--accent-green)}
+        .voice-card.error{border-color:#ef4444}
+        .voice-header{display:flex;align-items:flex-start;gap:14px;margin-bottom:16px}
+        .voice-num{width:42px;height:42px;border-radius:12px;background:var(--card-accent,var(--accent-blue));display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1.1rem;flex-shrink:0}
+        .voice-info h3{font-size:1.05rem;font-weight:700;color:var(--text-main);margin-bottom:3px}
+        .provider-tag{display:inline-block;font-size:.68rem;text-transform:uppercase;letter-spacing:.8px;padding:2px 8px;border-radius:20px;background:rgba(255,255,255,.06);color:var(--text-muted);font-weight:600}
+        .voice-desc{font-size:.85rem;color:var(--text-muted);margin-bottom:18px;line-height:1.5}
+        .voice-params{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px}
+        .param-chip{font-size:.72rem;padding:3px 10px;border-radius:20px;border:1px solid var(--border);color:var(--text-muted);background:rgba(255,255,255,.03)}
+        .param-chip strong{color:var(--text-main)}
+        .btn-play{width:100%;padding:13px;border:none;border-radius:12px;background:var(--card-accent,var(--accent-blue));color:#fff;font-family:'Inter',sans-serif;font-size:.95rem;font-weight:600;cursor:pointer;transition:all .2s ease;display:flex;align-items:center;justify-content:center;gap:8px}
+        .btn-play:hover:not(:disabled){filter:brightness(1.15);transform:scale(1.02)}
+        .btn-play:disabled{opacity:.6;cursor:not-allowed}
+        .status-bar{margin-top:12px;font-size:.78rem;text-align:center;min-height:20px;color:var(--text-muted)}
+        .status-bar.loading{color:var(--accent-gold)}
+        .status-bar.playing{color:var(--accent-green)}
+        .status-bar.error{color:#ef4444}
+        .wave-bars{display:none;align-items:center;justify-content:center;gap:3px;height:20px}
+        .wave-bars.active{display:flex}
+        .wave-bar{width:3px;background:var(--accent-green);border-radius:2px;animation:wave .8s ease-in-out infinite}
+        .wave-bar:nth-child(1){height:8px;animation-delay:0s}
+        .wave-bar:nth-child(2){height:14px;animation-delay:.1s}
+        .wave-bar:nth-child(3){height:20px;animation-delay:.2s}
+        .wave-bar:nth-child(4){height:12px;animation-delay:.3s}
+        .wave-bar:nth-child(5){height:8px;animation-delay:.4s}
+        @keyframes wave{0%,100%{transform:scaleY(.5)}50%{transform:scaleY(1)}}
+        .spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.3);border-top-color:white;border-radius:50%;animation:spin .7s linear infinite}
+        @keyframes spin{to{transform:rotate(360deg)}}
+        .card-aws{--card-accent:#ff9900}
+        .card-openai{--card-accent:#10a37f}
+        .card-gemini{--card-accent:#4f7bff}
+        .card-xai{--card-accent:#8b5cf6}
+        footer{text-align:center;padding:20px;color:var(--text-muted);font-size:.8rem;border-top:1px solid var(--border)}
+    </style>
+</head>
+<body>
+<header>
+    <div class="icon">🎙️</div>
+    <h1>Teste de Vozes Masculinas TTS</h1>
+    <p>Puter.js TTS — Gratuito e ilimitado. Clique em cada voz para ouvir a frase abaixo.</p>
+</header>
+<div class="phrase-box">
+    <label>🙏 Frase de Teste</label>
+    <div class="phrase-text">"A paz do Senhor, irmãos e irmãs!"</div>
+</div>
+<div class="voices-grid" id="voices-grid"></div>
+<footer>Puter.js TTS — Gratuito e ilimitado · AWS Polly · OpenAI · Gemini · xAI/Grok<br>Após ouvir todas, me diga o número da voz preferida! 🎯</footer>
+<script>
+const FRASE="A paz do Senhor, irmãos e irmãs!";
+const VOZES=[
+    {id:1,nome:"Ricardo - AWS Polly Neural",provider:"AWS Polly",cardClass:"card-aws",descricao:"Voz masculina brasileira nativa. Tom natural e claro.",params:[{label:"Voz",value:"Ricardo"},{label:"Engine",value:"neural"},{label:"Idioma",value:"pt-BR"}],config:{voice:"Ricardo",engine:"neural",language:"pt-BR"}},
+    {id:2,nome:"Ricardo - AWS Polly Standard",provider:"AWS Polly",cardClass:"card-aws",descricao:"Versão standard do Ricardo. Tom mais clássico e firme.",params:[{label:"Voz",value:"Ricardo"},{label:"Engine",value:"standard"},{label:"Idioma",value:"pt-BR"}],config:{voice:"Ricardo",engine:"standard",language:"pt-BR"}},
+    {id:3,nome:"Onyx - OpenAI (Grave/Masculino)",provider:"OpenAI",cardClass:"card-openai",descricao:"Voz profunda e grave do OpenAI. Muito usada para narração.",params:[{label:"Voz",value:"onyx"},{label:"Provider",value:"openai"},{label:"Modelo",value:"gpt-4o-mini-tts"}],config:{provider:"openai",voice:"onyx",model:"gpt-4o-mini-tts",instructions:"Fale em português do Brasil, tom solene e respeitoso de pregador cristão."}},
+    {id:4,nome:"Echo - OpenAI (Ressonante)",provider:"OpenAI",cardClass:"card-openai",descricao:"Voz masculina ressonante com profundidade e autoridade.",params:[{label:"Voz",value:"echo"},{label:"Provider",value:"openai"},{label:"Tom",value:"Pregador"}],config:{provider:"openai",voice:"echo",model:"gpt-4o-mini-tts",instructions:"Fale em português do Brasil, como um pastor evangélico falando com amor e autoridade espiritual."}},
+    {id:5,nome:"Fable - OpenAI (Narrativo)",provider:"OpenAI",cardClass:"card-openai",descricao:"Tom narrativo masculino, ideal para histórias e orações.",params:[{label:"Voz",value:"fable"},{label:"Provider",value:"openai"},{label:"Tom",value:"Narrativo"}],config:{provider:"openai",voice:"fable",model:"gpt-4o-mini-tts",instructions:"Fale em português do Brasil, tom calmo e meditativo de oração cristã."}},
+    {id:6,nome:"Leo - xAI Grok (Autoritativo)",provider:"xAI / Grok",cardClass:"card-xai",descricao:"Voz masculina autoritativa e poderosa do xAI.",params:[{label:"Voz",value:"leo"},{label:"Provider",value:"xai"},{label:"Perfil",value:"Autoritativo"}],config:{provider:"xai",voice:"leo",output_format:"mp3"}},
+    {id:7,nome:"Rex - xAI Grok (Confiante)",provider:"xAI / Grok",cardClass:"card-xai",descricao:"Voz masculina confiante com presença forte.",params:[{label:"Voz",value:"rex"},{label:"Provider",value:"xai"},{label:"Perfil",value:"Confiante"}],config:{provider:"xai",voice:"rex",output_format:"mp3"}},
+    {id:8,nome:"Charon - Gemini 2.5 Flash (Grave)",provider:"Google Gemini",cardClass:"card-gemini",descricao:"Voz masculina grave do Gemini. Tom sombrio e profundo.",params:[{label:"Voz",value:"Charon"},{label:"Provider",value:"gemini"},{label:"Modelo",value:"2.5-flash-tts"}],config:{provider:"gemini",model:"gemini-2.5-flash-preview-tts",voice:"Charon",instructions:"Fale em português do Brasil com tom solene e respeitoso de um pregador cristão."}},
+    {id:9,nome:"Fenrir - Gemini 2.5 Flash (Intenso)",provider:"Google Gemini",cardClass:"card-gemini",descricao:"Voz masculina intensa do Gemini. Tom potente e marcante.",params:[{label:"Voz",value:"Fenrir"},{label:"Provider",value:"gemini"},{label:"Modelo",value:"2.5-flash-tts"}],config:{provider:"gemini",model:"gemini-2.5-flash-preview-tts",voice:"Fenrir",instructions:"Fale em português do Brasil com energia e fervor espiritual evangélico."}},
+    {id:10,nome:"Enceladus - Gemini 2.5 Flash (Profundo)",provider:"Google Gemini",cardClass:"card-gemini",descricao:"Voz masculina profunda e suave do Gemini.",params:[{label:"Voz",value:"Enceladus"},{label:"Provider",value:"gemini"},{label:"Modelo",value:"2.5-flash-tts"}],config:{provider:"gemini",model:"gemini-2.5-flash-preview-tts",voice:"Enceladus",instructions:"Fale em português do Brasil com calma e paz, como um pastor em oração."}}
+];
+const grid=document.getElementById('voices-grid');
+let currentAudio=null;
+VOZES.forEach(voz=>{
+    const card=document.createElement('div');
+    card.className=`voice-card ${voz.cardClass}`;
+    card.id=`card-${voz.id}`;
+    const paramsHTML=voz.params.map(p=>`<span class="param-chip"><strong>${p.label}:</strong> ${p.value}</span>`).join('');
+    card.innerHTML=`<div class="voice-header"><div class="voice-num">${voz.id}</div><div class="voice-info"><h3>${voz.nome}</h3><span class="provider-tag">${voz.provider}</span></div></div><p class="voice-desc">${voz.descricao}</p><div class="voice-params">${paramsHTML}</div><button class="btn-play" id="btn-${voz.id}" onclick="playVoice(${voz.id})">▶ Ouvir Voz</button><div class="status-bar" id="status-${voz.id}">Clique para ouvir</div><div class="wave-bars" id="wave-${voz.id}"><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div></div>`;
+    grid.appendChild(card);
+});
+async function playVoice(id){
+    const voz=VOZES.find(v=>v.id===id);
+    const btn=document.getElementById(`btn-${id}`);
+    const status=document.getElementById(`status-${id}`);
+    const wave=document.getElementById(`wave-${id}`);
+    const card=document.getElementById(`card-${id}`);
+    if(currentAudio){currentAudio.pause();currentAudio=null}
+    btn.disabled=true;
+    btn.innerHTML=`<span class="spinner"></span> Gerando...`;
+    status.textContent='Conectando ao Puter.js TTS...';
+    status.className='status-bar loading';
+    wave.classList.remove('active');
+    card.classList.remove('success','error');
+    card.classList.add('loading');
+    try{
+        const audio=await puter.ai.txt2speech(FRASE,voz.config);
+        card.classList.remove('loading');
+        card.classList.add('success');
+        btn.innerHTML=`Tocando...`;
+        status.textContent='Reproduzindo audio...';
+        status.className='status-bar playing';
+        wave.classList.add('active');
+        currentAudio=audio;
+        audio.play();
+        audio.addEventListener('ended',()=>{
+            btn.disabled=false;
+            btn.innerHTML=`▶ Ouvir novamente`;
+            status.textContent='Concluido! Clique para repetir.';
+            status.className='status-bar';
+            wave.classList.remove('active');
+            currentAudio=null;
+        });
+    }catch(err){
+        console.error('Erro na voz',id,err);
+        card.classList.remove('loading');
+        card.classList.add('error');
+        btn.disabled=false;
+        btn.innerHTML=`▶ Tentar novamente`;
+        let errMsg=err.message||'Erro desconhecido';
+        status.textContent=`Erro: ${errMsg.slice(0,80)}`;
+        status.className='status-bar error';
+        wave.classList.remove('active');
+    }
+}
+</script>
+</body>
+</html>

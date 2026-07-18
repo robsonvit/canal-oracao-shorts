@@ -4,8 +4,8 @@
 groq>=0.9.0
 
 # TTS — síntese de voz masculina
-edge-tts>=6.1.9
-
+kokoro>=0.9.4
+soundfile>=0.12.0
 # HTTP — download de vídeos e músicas
 requests>=2.31.0
 

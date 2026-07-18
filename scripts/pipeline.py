@@ -71,7 +71,7 @@ def main():
     # ──────────────────────────────────────────────────────────────────────────
     # PASSO 3 — Gerar áudio TTS e legendas SRT
     # ──────────────────────────────────────────────────────────────────────────
-    _titulo(3, 7, "Gerando áudio TTS masculino + legendas (edge-tts + Groq Whisper)...")
+    _titulo(3, 7, "Gerando áudio TTS masculino + legendas (Kokoro + Groq Whisper)...")
     from scripts.gerar_audio import gerar as gerar_audio
 
     audio_path, srt_path = gerar_audio(dados["oracao_texto"], OUTPUT_DIR)
@@ -132,7 +132,7 @@ def main():
     # ── Resumo final ───────────────────────────────────────────────────────
     print("\n" + "═"*60)
     print("  📁 Arquivos gerados:")
-    for nome in ["conteudo.json", "audio.mp3", "legendas.srt"]:
+    for nome in ["conteudo.json", "audio.wav", "legendas.srt"]:
         caminho = os.path.join(OUTPUT_DIR, nome)
         if os.path.exists(caminho):
             tamanho = os.path.getsize(caminho)
