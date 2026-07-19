@@ -17,6 +17,7 @@ import requests
 MUSICAS = {
     # Músicas de suspense, épicas, sombrias
     "misterio": [
+        "https://upload.wikimedia.org/wikipedia/commons/b/b5/J.S._Bach_-_Toccata_and_Fugue_in_D_minor_BWV_565.ogg",
         "https://archive.org/download/HolstThePlanetsMars/01MarsTheBringerOfWar.mp3",
         "https://archive.org/download/BachToccataAndFugueInDMinor_201705/Bach-Toccata-and-Fugue-in-d-minor.mp3",
     ]
@@ -24,7 +25,7 @@ MUSICAS = {
 
 # Fallback garantido (sempre disponível)
 FALLBACK_URL = (
-    "https://archive.org/download/BeethovenSymphonyNo.5_201705/01-SymphonyNo.5InCMinorOp.67-I.AllegroConBrio.mp3"
+    "https://upload.wikimedia.org/wikipedia/commons/4/4c/Beethoven_Moonlight_1st_movement.ogg"
 )
 
 HEADERS = {
@@ -71,7 +72,8 @@ def baixar_musica(musica_key: str = "misterio") -> str:
                 os.remove(dest)
             continue
 
-    raise RuntimeError(f"Não foi possível baixar música para a chave '{musica_key}'.")
+    print(f"⚠️  Todas as tentativas de baixar música falharam. Continuando sem música.")
+    return None
 
 
 if __name__ == "__main__":

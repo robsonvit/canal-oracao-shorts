@@ -54,7 +54,7 @@ def montar_video(
     clips: list[str],
     audio_path: str,
     legendas_srt: str,
-    musica_path: str,
+    musica_path: str | None = None,
     output_dir: str = "output",
     versiculo_texto: str = "",
     versiculo_ref: str = "",
@@ -85,16 +85,23 @@ def montar_video(
         "MarginV=90",
     ])
 
-    # Monta a string de filtros de vídeo (sem texto de versículo na tela)
     v_filters = f"[0:v]eq=brightness=-0.03:contrast=1.02,subtitles='{srt_escaped}':force_style='{subtitle_style}'[v]"
 
     cmd_final = [
         "ffmpeg", "-y",
         "-f", "concat", "-safe", "0", "-i", lista_concat,
         "-i", audio_path,
-        "-stream_loop", "-1", "-i", musica_path,
+    ]
+
+    if musica_path and os.path.exists(musica_path):
+        cmd_final.extend(["-stream_loop", "-1", "-i", musica_path])
+        f_complex = f"{v_filters};[1:a]volume=1.0[voice];[2:a]volume=0.15[bg];[voice][bg]amix=inputs=2:duration=first:dropout_transition=2[a]"
+    else:
+        f_complex = f"{v_filters};[1:a]volume=1.0[a]"
+
+    cmd_final.extend([
         "-t", str(duracao_audio),
-        "-filter_complex", f"{v_filters};[1:a]volume=1.0[voice];[2:a]volume=0.15[bg];[voice][bg]amix=inputs=2:duration=first:dropout_transition=2[a]",
+        "-filter_complex", f_complex,
         "-map", "[v]",
         "-map", "[a]",
         "-c:v", "libx264",
