@@ -113,7 +113,7 @@ def montar_video(
         "-movflags", "+faststart",
         "-map_metadata", "-1",
         output_path,
-    ]
+    ])
 
     resultado = subprocess.run(cmd_final, capture_output=True, text=True)
     if resultado.returncode != 0:
