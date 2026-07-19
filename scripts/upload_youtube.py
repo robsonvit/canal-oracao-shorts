@@ -105,7 +105,7 @@ def upload_youtube(
             "privacyStatus":           "public",
             "selfDeclaredMadeForKids": False,
             "madeForKids":             False,
-            "containsSyntheticMedia":  True,    # Declara uso de IA (TTS)
+            "containsSyntheticMedia":  False,   # Não declara uso de IA (conforme pedido)
         },
     }
 
