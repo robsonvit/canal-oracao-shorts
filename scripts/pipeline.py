@@ -1,26 +1,29 @@
 """
 pipeline.py
 ───────────
-Orquestrador principal do Canal Oração Shorts.
-Detecta o período do dia e executa todos os passos em sequência:
+Orquestrador principal do Canal Curiosidades Bíblicas.
+Sorteia um tema de mistério/curiosidade e executa os passos em sequência:
 
-  1. Detectar período (bom dia / boa tarde / boa noite)
-  2. Gerar oração curta + versículo bíblico via Groq AI
+  1. Sortear tema (Ex: Mistérios Ocultos)
+  2. Gerar roteiro via Groq AI
   3. Gerar áudio TTS masculino + legendas SRT
-  4. Baixar música instrumental por período
+  4. Baixar música instrumental épica/suspense
   5. Buscar e processar clipes de vídeo portrait (9:16) do Pexels
-  6. Montar Short 1080×1920 com card de versículo + legendas destacadas
+  6. Montar Short 1080×1920 com legendas destacadas
   7. Upload para o YouTube como Short (publicação imediata)
 
 Uso:
     python scripts/pipeline.py
-    PERIODO=boa_noite python scripts/pipeline.py   ← força período
 """
 
 import os
 import sys
 import json
 import traceback
+
+# Força o stdout a usar utf-8 (evita erros no Windows ao imprimir emojis)
+if sys.stdout.encoding.lower() != "utf-8":
+    sys.stdout.reconfigure(encoding="utf-8")
 
 ROOT_DIR   = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUTPUT_DIR = os.path.join(ROOT_DIR, "output")
@@ -42,27 +45,26 @@ def main():
     print("═"*60)
 
     # ──────────────────────────────────────────────────────────────────────────
-    # PASSO 1 — Detectar período do dia
+    # PASSO 1 — Sortear tema
     # ──────────────────────────────────────────────────────────────────────────
-    _titulo(1, 7, "Detectando período do dia...")
-    from scripts.detectar_periodo import detectar_periodo
+    _titulo(1, 7, "Sorteando tema da curiosidade...")
+    from scripts.sortear_tema import sortear_tema
 
-    periodo_info = detectar_periodo()
-    print(f"✅ {periodo_info['emoji']} {periodo_info['saudacao']} | "
-          f"Período: {periodo_info['periodo']}")
+    tema_info = sortear_tema()
+    print(f"✅ Tema Sorteado: {tema_info['categoria']}")
 
     # ──────────────────────────────────────────────────────────────────────────
-    # PASSO 2 — Gerar oração curta + versículo via Groq AI
+    # PASSO 2 — Gerar roteiro via Groq AI
     # ──────────────────────────────────────────────────────────────────────────
-    _titulo(2, 7, "Gerando oração e versículo com Groq AI (llama-3.3-70b)...")
+    _titulo(2, 7, "Gerando roteiro com Groq AI (llama-3.3-70b)...")
     from scripts.gerar_conteudo import gerar_conteudo
 
-    dados = gerar_conteudo(periodo_info)
+    dados = gerar_conteudo(tema_info)
     conteudo_json = os.path.join(OUTPUT_DIR, "conteudo.json")
 
     palavras = len(dados["oracao_texto"].split())
-    print(f"✅ Versículo : {dados['versiculo_ref']}")
-    print(f"   Oração   : {palavras} palavras ({palavras/2.5:.0f}s estimado)")
+    print(f"✅ Gancho : {dados['gancho']}")
+    print(f"   Roteiro   : {palavras} palavras ({palavras/2.5:.0f}s estimado)")
     print(f"   Título   : {dados['titulo']}")
 
     with open(conteudo_json, "w", encoding="utf-8") as f:
@@ -77,12 +79,12 @@ def main():
     audio_path, srt_path = gerar_audio(dados["oracao_texto"], OUTPUT_DIR)
 
     # ──────────────────────────────────────────────────────────────────────────
-    # PASSO 4 — Baixar música instrumental por período
+    # PASSO 4 — Baixar música instrumental de mistério/suspense
     # ──────────────────────────────────────────────────────────────────────────
-    _titulo(4, 7, f"Baixando música de fundo para '{periodo_info['saudacao']}'...")
+    _titulo(4, 7, f"Baixando música de fundo para '{tema_info['musica_key']}'...")
     from scripts.baixar_musica import baixar_musica
 
-    musica_path = baixar_musica(periodo_info["periodo"])
+    musica_path = baixar_musica(tema_info["musica_key"])
     print(f"✅ Música: {musica_path}")
 
     # ──────────────────────────────────────────────────────────────────────────
@@ -92,7 +94,7 @@ def main():
     from scripts.buscar_video import buscar_e_processar_clips
 
     clips = buscar_e_processar_clips(
-        termos_busca=periodo_info["termos_video"],
+        termos_busca=tema_info["termos_video"],
         n_clips=5,
         output_dir=OUTPUT_DIR,
     )
@@ -101,7 +103,7 @@ def main():
     # ──────────────────────────────────────────────────────────────────────────
     # PASSO 6 — Montar Short 1080×1920
     # ──────────────────────────────────────────────────────────────────────────
-    _titulo(6, 7, "Montando Short 1080×1920 com card de versículo + legendas...")
+    _titulo(6, 7, "Montando Short 1080×1920 com legendas...")
     from scripts.montar_video import montar_video
 
     video_final = montar_video(

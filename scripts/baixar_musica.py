@@ -2,9 +2,9 @@
 baixar_musica.py
 ────────────────
 Baixa músicas instrumentais sem direitos autorais do Archive.org
-por período do dia (bom dia / boa tarde / boa noite).
+para estilo de curiosidades bíblicas/mistério.
 
-Cada música é cacheada localmente em data/bg_music_{periodo}.mp3
+Cada música é cacheada localmente em data/bg_music_{key}.mp3
 para evitar download repetido.
 """
 
@@ -12,32 +12,19 @@ import os
 import requests
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Músicas por período (Archive.org — domínio público / Creative Commons)
+# Músicas por estilo (Archive.org — domínio público / Creative Commons)
 # ─────────────────────────────────────────────────────────────────────────────
 MUSICAS = {
-    # Manhã: Canon de Pachelbel — suave, esperançoso, perfeito para despertar
-    "bom_dia": [
-        "https://archive.org/download/ClassicalMusicPlaylist/Pachelbel_Canon_in_D.mp3",
-        "https://archive.org/download/BaptistMusic/How%20Beautiful%20-%20piano%20instrumental%20cover%20with%20lyrics.mp3",
-    ],
-
-    # Tarde: Gymnopédie de Satie — tranquilo, contemplativo, paz interior
-    "boa_tarde": [
-        "https://archive.org/download/ClassicalMusicPlaylist/Debussy_Clair_de_lune.mp3",
-        "https://archive.org/download/BaptistMusic/How%20Beautiful%20-%20piano%20instrumental%20cover%20with%20lyrics.mp3",
-    ],
-
-    # Noite: Moonlight Sonata de Beethoven — noturno, profundo, tranquilizador
-    "boa_noite": [
-        "https://archive.org/download/ClassicalMusicPlaylist/Beethoven_Moonlight_Sonata.mp3",
-        "https://archive.org/download/BaptistMusic/How%20Beautiful%20-%20piano%20instrumental%20cover%20with%20lyrics.mp3",
-    ],
+    # Músicas de suspense, épicas, sombrias
+    "misterio": [
+        "https://archive.org/download/HolstThePlanetsMars/01MarsTheBringerOfWar.mp3",
+        "https://archive.org/download/BachToccataAndFugueInDMinor_201705/Bach-Toccata-and-Fugue-in-d-minor.mp3",
+    ]
 }
 
 # Fallback garantido (sempre disponível)
 FALLBACK_URL = (
-    "https://archive.org/download/BaptistMusic/"
-    "How%20Beautiful%20-%20piano%20instrumental%20cover%20with%20lyrics.mp3"
+    "https://archive.org/download/BeethovenSymphonyNo.5_201705/01-SymphonyNo.5InCMinorOp.67-I.AllegroConBrio.mp3"
 )
 
 HEADERS = {
@@ -49,16 +36,16 @@ HEADERS = {
 }
 
 
-def baixar_musica(periodo: str = "bom_dia") -> str:
+def baixar_musica(musica_key: str = "misterio") -> str:
     """
-    Garante que a música de fundo para o período está disponível localmente.
+    Garante que a música de fundo para o estilo está disponível localmente.
 
     Parâmetros:
-        periodo — "bom_dia", "boa_tarde" ou "boa_noite"
+        musica_key — ex: "misterio"
 
     Retorna o caminho para o arquivo MP3.
     """
-    dest = f"data/bg_music_{periodo}.mp3"
+    dest = f"data/bg_music_{musica_key}.mp3"
 
     if os.path.exists(dest):
         print(f"🎵 Música já existe: {dest}")
@@ -66,10 +53,10 @@ def baixar_musica(periodo: str = "bom_dia") -> str:
 
     os.makedirs("data", exist_ok=True)
 
-    urls = MUSICAS.get(periodo, []) + [FALLBACK_URL]
+    urls = MUSICAS.get(musica_key, []) + [FALLBACK_URL]
 
     for url in urls:
-        print(f"🎵 Baixando música para '{periodo}': {url[:60]}...")
+        print(f"🎵 Baixando música para '{musica_key}': {url[:60]}...")
         try:
             r = requests.get(url, headers=HEADERS, stream=True, timeout=45)
             r.raise_for_status()
@@ -84,10 +71,10 @@ def baixar_musica(periodo: str = "bom_dia") -> str:
                 os.remove(dest)
             continue
 
-    raise RuntimeError(f"Não foi possível baixar música para o período '{periodo}'.")
+    raise RuntimeError(f"Não foi possível baixar música para a chave '{musica_key}'.")
 
 
 if __name__ == "__main__":
-    for p in ["bom_dia", "boa_tarde", "boa_noite"]:
+    for p in ["misterio"]:
         caminho = baixar_musica(p)
         print(f"  {p}: {caminho}")

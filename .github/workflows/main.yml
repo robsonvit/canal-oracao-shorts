@@ -7,19 +7,8 @@ on:
     - cron: '0 15 * * *'   # 12:00 BRT → Boa Tarde (entardecer)
     - cron: '0 21 * * *'   # 18:00 BRT → Boa Noite (lua/estrelas)
 
-  # ── Execução manual com escolha do período ──────────────────────────────────
+  # ── Execução manual ──────────────────────────────────
   workflow_dispatch:
-    inputs:
-      periodo:
-        description: 'Período do dia (deixe vazio para detectar automaticamente)'
-        required: false
-        default: ''
-        type: choice
-        options:
-          - ''
-          - bom_dia
-          - boa_tarde
-          - boa_noite
 
 permissions:
   contents: write    # Para salvar tracking de vídeos usados
@@ -30,7 +19,6 @@ env:
   YOUTUBE_CLIENT_ID:         ${{ secrets.YOUTUBE_CLIENT_ID }}
   YOUTUBE_CLIENT_SECRET:     ${{ secrets.YOUTUBE_CLIENT_SECRET }}
   YOUTUBE_REFRESH_TOKEN:     ${{ secrets.YOUTUBE_REFRESH_TOKEN }}
-  PERIODO:                   ${{ github.event.inputs.periodo }}
 
 jobs:
   gerar-short:
@@ -85,8 +73,8 @@ jobs:
           cat output/conteudo.json 2>/dev/null | python3 -c "
           import json,sys
           data=json.load(sys.stdin)
-          print(f'Período   : {data.get(\"saudacao\", \"?\")}')
-          print(f'Versículo : {data.get(\"versiculo_ref\", \"?\")}')
+          print(f'Categoria : {data.get(\"categoria\", \"?\")}')
+          print(f'Gancho    : {data.get(\"gancho\", \"?\")}')
           print(f'Título    : {data.get(\"titulo\", \"?\")}')
           print(f'Palavras  : {len(data.get(\"oracao_texto\", \"\").split())}')
           " || echo "(não encontrado)"
