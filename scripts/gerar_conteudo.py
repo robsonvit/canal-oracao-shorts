@@ -64,13 +64,13 @@ REGRAS OBRIGATÓRIAS:
 - SEM markdown, asteriscos, negritos ou formatação — apenas texto puro para ser lido pelo sintetizador de voz.
 - Parágrafos separados por linha em branco.
 
-Ao final do texto do roteiro, adicione exatamente esta linha separadora e o JSON:
+Ao final do texto do roteiro, adicione exatamente esta linha separadora e um JSON gerado DINAMICAMENTE com as melhores práticas de SEO para o YouTube, focado em ranqueamento, retenção e alta taxa de clique (CTR). Você deve analisar o roteiro criado e gerar os campos com base no conteúdo:
 
 ---JSON---
 {{
-  "titulo": "{gancho} 🤯 | #CuriosidadesBiblicas #Shorts",
-  "descricao": "Você sabia disso? 📖 Descubra hoje mais sobre {categoria} neste vídeo! Inscreva-se para mais segredos e fatos ocultos da Bíblia. #Shorts #CuriosidadesBiblicas #Misterios #Teologia",
-  "tags": ["Shorts", "curiosidades", "bíblia", "mistérios da bíblia", "teologia", "história bíblica", "arqueologia bíblica", "fatos ocultos"]
+  "titulo": "CRIE UM TÍTULO INTRIGANTE (máx 60 caracteres) com gatilhos mentais de curiosidade e forte apelo SEO. Use 1 ou 2 emojis. Exemplo: O Segredo Oculto de {categoria} 🤯 #Shorts",
+  "descricao": "CRIE UMA DESCRIÇÃO OTIMIZADA PARA SEO (mínimo 3 frases). O primeiro parágrafo deve conter palavras-chave fortes sobre o roteiro. Inclua uma pergunta para engajar os comentários, uma chamada para ação (CTA) clara pedindo inscrição e adicione 3 a 5 hashtags estratégicas no final. Seja criativo e evite textos genéricos.",
+  "tags": ["adicione", "de", "8", "a", "15", "tags", "estrategicas", "incluindo", "termos de cauda longa", "relacionados ao misterio abordado", "Shorts"]
 }}
 """
 
