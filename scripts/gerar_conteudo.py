@@ -46,10 +46,11 @@ ESTRUTURA OBRIGATÓRIA:
    - Comece EXATAMENTE com a frase: "{gancho}"
    - Adicione uma ou duas frases criando suspense e curiosidade sobre o assunto.
 
-2. O DESENVOLVIMENTO DO MISTÉRIO/FATO (2 a 3 parágrafos curtos):
-   - Explique o fato histórico, o mito desvendado, a curiosidade arqueológica ou profecia.
+2. O DESENVOLVIMENTO DO MISTÉRIO/FATO E RESPOSTA (2 a 3 parágrafos curtos):
+   - Traga a RESPOSTA COMPLETA E PROFUNDA para o mistério levantado no gancho. Não deixe o conteúdo raso.
+   - Explique o fato histórico, o mito desvendado, a curiosidade arqueológica ou profecia com riqueza de detalhes e argumentos.
+   - OBRIGATÓRIO: Cite pelo menos UM versículo bíblico (com sua referência, ex: João 3:16) que comprove ou embase o mistério, integrando-o de forma natural à narração.
    - Use um tom de revelação de um segredo oculto ou algo impressionante.
-   - Seja direto e claro, sem enrolação.
 
 3. CONCLUSÃO E CHAMADA DE AÇÃO (1 parágrafo curto):
    - Dê uma conclusão de impacto que deixe o espectador pensando.
@@ -58,7 +59,7 @@ ESTRUTURA OBRIGATÓRIA:
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 REGRAS OBRIGATÓRIAS:
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-- MÍNIMO 180 palavras, MÁXIMO 220 palavras (muito importante para caber em 1 minuto de áudio TTS!)
+- MÍNIMO 180 palavras, MÁXIMO 250 palavras (importante ter profundidade, citar versículo, mas ser rápido para caber no tempo de áudio Shorts!)
 - Tom: Documentário, misterioso, envolvente, direto.
 - Linguagem: português brasileiro formal-popular
 - SEM markdown, asteriscos, negritos ou formatação — apenas texto puro para ser lido pelo sintetizador de voz.
@@ -70,7 +71,9 @@ Ao final do texto do roteiro, adicione exatamente esta linha separadora e um JSO
 {{
   "titulo": "CRIE UM TÍTULO INTRIGANTE (máx 60 caracteres) com gatilhos mentais de curiosidade e forte apelo SEO. Use 1 ou 2 emojis. Exemplo: O Segredo Oculto de {categoria} 🤯 #Shorts",
   "descricao": "CRIE UMA DESCRIÇÃO OTIMIZADA PARA SEO (mínimo 3 frases). O primeiro parágrafo deve conter palavras-chave fortes sobre o roteiro. Inclua uma pergunta para engajar os comentários, uma chamada para ação (CTA) clara pedindo inscrição e adicione 3 a 5 hashtags estratégicas no final. Seja criativo e evite textos genéricos.",
-  "tags": ["adicione", "de", "8", "a", "15", "tags", "estrategicas", "incluindo", "termos de cauda longa", "relacionados ao misterio abordado", "Shorts"]
+  "tags": ["adicione", "de", "8", "a", "15", "tags", "estrategicas", "incluindo", "termos de cauda longa", "relacionados ao misterio abordado", "Shorts"],
+  "versiculo_texto": "Texto do versículo bíblico principal utilizado no roteiro",
+  "versiculo_ref": "Referência do versículo bíblico principal (ex: João 3:16)"
 }}
 """
 
@@ -100,8 +103,8 @@ Ao final do texto do roteiro, adicione exatamente esta linha separadora e um JSO
     metadata["gancho"]          = gancho
     
     # Preencher campos legados que o pipeline atual possa exigir para evitar quebras
-    metadata["versiculo_texto"] = "" 
-    metadata["versiculo_ref"]   = ""
+    metadata["versiculo_texto"] = metadata.get("versiculo_texto", "")
+    metadata["versiculo_ref"]   = metadata.get("versiculo_ref", "")
 
     palavras = len(oracao_texto.split())
     print(f"✅ Roteiro gerado: {palavras} palavras")
